@@ -32,30 +32,33 @@ jobs:
       - name: Zip project
         run: zip -r app.zip . -x ".git/*" "node_modules/*" ".github/*"
 
-      # 6. Configurar credenciais da AWS
-      - name: Configure AWS Credentials
-        uses: aws-actions/[email protected]  # Agora corrigido
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Substitua pela sua região
+      # 6. Instalar o AWS CLI
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
 
-      # 7. Fazer upload do pacote para o S3
+      # 7. Configurar credenciais da AWS
+      - name: Configure AWS Credentials
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region us-east-1
+
+      # 8. Fazer upload do pacote para o S3
       - name: Upload to S3
         run: aws s3 cp app.zip s3://clientes-api-bucket/app.zip  # Substitua pelo nome do bucket
 
-      # 8. Deploy para o Elastic Beanstalk usando o pacote do S3
+      # 9. Deploy para o Elastic Beanstalk usando o pacote do S3
       - name: Deploy to Elastic Beanstalk
-        uses: einaregilsson/[email protected]
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: 'ClientesApi'
-          environment_name: 'ClientesApi-env'
-          version_label: ${{ github.sha }}
-          region: 'us-east-1'
-          deployment_package: 'app.zip'
+        run: |
+          aws elasticbeanstalk create-application-version --application-name "ClientesApi" \
+            --version-label "${{ github.sha }}" \
+            --source-bundle S3Bucket="clientes-api-bucket",S3Key="app.zip"
+          
+          aws elasticbeanstalk update-environment --environment-name "ClientesApi-env" \
+            --version-label "${{ github.sha }}"
 
-      # 9. Limpeza do workspace (opcional)
+      # 10. Limpeza do workspace (opcional)
       - name: Clean up
         run: rm app.zip
