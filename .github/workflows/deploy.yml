@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout do código-fonte
+      # 1. Checkout do código-fonte do projeto
       - name: Checkout code
         uses: actions/checkout@v3
 
