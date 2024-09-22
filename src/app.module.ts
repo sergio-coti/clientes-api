@@ -15,7 +15,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'bdclientes',
       autoLoadEntities: true,
       synchronize: true,
-      logging: true
+      logging: true,
+      ssl: { rejectUnauthorized: false }
     }),
     ClientesModule
   ],
