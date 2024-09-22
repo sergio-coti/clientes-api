@@ -1,0 +1,49 @@
+name: Deploy NestJS to Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do código-fonte
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Configuração do Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # 3. Instalação das dependências
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Construir a aplicação para produção
+      - name: Build the app
+        run: npm run build
+
+      # 5. Zipar a build
+      - name: Zip project
+        run: zip -r app.zip . -x ".git/*" "node_modules/*" ".github/*"
+
+      # 6. Deploy para o Elastic Beanstalk
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: 'ClientesApi'
+          environment_name: 'ClientesApi-env'
+          version_label: ${{ github.sha }}
+          region: 'us-east-1'
+          zip_file: 'app.zip'
+
+      # 7. Limpeza do workspace (opcional)
+      - name: Clean up
+        run: rm app.zip
