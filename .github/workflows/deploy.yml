@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout do código-fonte do projeto
+      # 1. Checkout do código-fonte
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -34,11 +34,11 @@ jobs:
 
       # 6. Fazer upload do pacote para o S3
       - name: Upload to S3
-        uses: aws-actions/[email protected] # Aqui estava o problema, use o @v1
+        uses: aws-actions/[email protected]  # Ação correta para upload no S3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          region: 'us-east-1'
+          aws-region: 'us-east-1'
           bucket: 'clientes-api-bucket'
           source: 'app.zip'
           destination: 'app.zip'
