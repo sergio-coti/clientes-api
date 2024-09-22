@@ -6,6 +6,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 @ApiTags('Clientes')
 @Controller('clientes')
 export class ClientesController {
+    
   constructor(private clientesService: ClientesService) {}
 
   @ApiOperation({
@@ -13,7 +14,7 @@ export class ClientesController {
     description: 'Criar um novo cliente na base de dados.',
   })
   @Post()
-  post(@Body() model: ClientesModel): ClientesModel {
+  post(@Body() model: ClientesModel): Promise<ClientesModel> {
     return this.clientesService.add(model);
   }
 
@@ -22,7 +23,7 @@ export class ClientesController {
     description: 'Consultar os clientes cadastrados na base de dados.',
   })
   @Get()
-  getAll(): ClientesModel[] {
+  getAll(): Promise<ClientesModel[]> {
     return this.clientesService.findAll();
   }
 }

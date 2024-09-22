@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { ClientesModel } from '../models/clientes.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ClientesService {
-    
-  clientes: ClientesModel[] = [];
 
-  add(cliente: ClientesModel): ClientesModel {
-    this.clientes.push(cliente);
-    return cliente;
+  constructor(
+    @InjectRepository(ClientesModel)
+    private clientesRepository: Repository<ClientesModel>,
+  ) {}
+
+  async add(cliente: ClientesModel): Promise<ClientesModel> {
+    const result = await this.clientesRepository.save(cliente);
+    return result;
   }
 
-  findAll(): ClientesModel[] {
-    return this.clientes;
+  async findAll(): Promise<ClientesModel[]> {
+    return await this.clientesRepository.find();
   }
 }
