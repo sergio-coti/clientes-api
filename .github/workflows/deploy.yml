@@ -34,7 +34,7 @@ jobs:
 
       # 6. Fazer upload do pacote para o S3
       - name: Upload to S3
-        uses: aws-actions/[email protected]
+        uses: aws-actions/[email protected] # Aqui estava o problema, use o @v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
