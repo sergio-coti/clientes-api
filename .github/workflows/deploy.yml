@@ -32,16 +32,16 @@ jobs:
       - name: Zip project
         run: zip -r app.zip . -x ".git/*" "node_modules/*" ".github/*"
 
-      # 6. Fazer upload do pacote para o S3 usando a ação correta
+      # 6. Fazer upload do pacote para o S3
       - name: Upload to S3
-        uses: kbrashears5/[email protected]
+        uses: aws-actions/[email protected]
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           region: 'us-east-1'
           bucket: 'clientes-api-bucket'
-          source-dir: 'app.zip'
-          dest-dir: 'app.zip'
+          source: 'app.zip'
+          destination: 'app.zip'
 
       # 7. Deploy para o Elastic Beanstalk usando o pacote do S3
       - name: Deploy to Elastic Beanstalk
@@ -52,7 +52,7 @@ jobs:
           application_name: 'ClientesApi'
           environment_name: 'ClientesApi-env'
           version_label: ${{ github.sha }}
-          region: 'us-east-1' # Substitua pela sua região da AWS
+          region: 'us-east-1'
           deployment_package: 'app.zip'
 
       # 8. Limpeza do workspace (opcional)
