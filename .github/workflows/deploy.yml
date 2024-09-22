@@ -32,18 +32,20 @@ jobs:
       - name: Zip project
         run: zip -r app.zip . -x ".git/*" "node_modules/*" ".github/*"
 
-      # 6. Fazer upload do pacote para o S3
-      - name: Upload to S3
+      # 6. Configurar credenciais da AWS
+      - name: Configure AWS Credentials
         uses: aws-actions/[email protected]
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          region: 'us-east-1'
-          bucket: 'clientes-api-bucket'  # Substitua pelo nome do seu bucket S3
-          source: 'app.zip'
-          destination: 'app.zip'
+          aws-region: us-east-1  # Substitua pela sua região
 
-      # 7. Deploy para o Elastic Beanstalk usando o pacote do S3
+      # 7. Fazer upload do pacote para o S3
+      - name: Upload to S3
+        run: |
+          aws s3 cp app.zip s3://clientes-api-bucket/app.zip  # Substitua pelo nome do bucket
+
+      # 8. Deploy para o Elastic Beanstalk usando o pacote do S3
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
@@ -55,6 +57,6 @@ jobs:
           region: 'us-east-1'
           deployment_package: 'app.zip'
 
-      # 8. Limpeza do workspace (opcional)
+      # 9. Limpeza do workspace (opcional)
       - name: Clean up
         run: rm app.zip
